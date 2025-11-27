@@ -1,0 +1,82 @@
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Introduction :-
+    -- Gradle Build Tool is a fast, dependable, and adaptable open-source build automation tool with an elegant and extensible declarative build language.
+
+Supported Language :-
+    -- a) Android
+    -- b) Java
+    -- c) Kotlin
+    -- d) Groovy
+    -- e) Scala
+    -- f) Javascript
+    -- g) C/C++
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Core Concepts :-
+    Gradle automates building, testing and deployments of software from information in build scripts.
+
+    1) Build :-
+            The process and environment for producing outputs. A build includes one or more projects and their build scripts.
+
+    2) Project :-
+            A piece of software that can be built, such as an application or library.
+            A build may have a single root project or multiple subprojects.
+
+    3) Task :-
+            A basic unit of work, like compiling code or running tests.
+            Tasks are declared in build scripts or added by plugins.
+
+    4) Build Script :-
+            A configuration file (build.gradle(.kts)) that defines tasks, dependencies, and other instructions that tell Gradle how to build a project.
+
+    5) Plugin :-
+            Used to extend Gradle’s capabilities (like the Java plugin). Plugins often add tasks and conventions to projects.
+
+    6) Dependency :-
+            	External or internal resources required by a project. Gradle automatically resolves these during the build.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Project Structure :-
+
+    project
+    ├── gradle                  1
+    ├── gradlew                 2
+    ├── gradlew.bat             2
+    ├── settings.gradle(.kts)   3
+    ├── subproject-a
+    │   ├── build.gradle(.kts)  4
+    │   └── src/                5
+    └── subproject-b
+        ├── build.gradle(.kts)  4
+        └── src/                5
+
+    1 :- Gradle Directory to store wrapper files and more
+    2 :- Gradle wrapper scripts THIS IS GRADLE PROJECT!
+    3 :- Gradle settings file to define a root project name and subprojects
+    4 :- Gradle build scripts of the two subprojects - subproject-a and subproject-b
+    5 :- Source code and/or additional files for the projects
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Invoking Gradle :-
+
+    1) In the IDE :-
+        Gradle is built-in to many IDEs including Android Studio, IntelliJ IDEA, Visual Studio Code, Eclipse, and NetBeans.
+        Gradle can be automatically invoked when you build, clean, or run your app in the IDE
+
+    2) On the Command Line :-
+
+        - a) With Gradle installed locally :-
+                - gradle build
+                - gradle test
+                - gradle clean build
+
+
+
+
+
+
+
