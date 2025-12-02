@@ -21,8 +21,9 @@ Core Concepts :-
             The process and environment for producing outputs. A build includes one or more projects and their build scripts.
 
     2) Project :-
-            A piece of software that can be built, such as an application or library.
-            A build may have a single root project or multiple subprojects.
+            A Gradle project is a piece of software that can be built, such as an application or a library.
+            Single project builds include a single project called the root project.
+            Multi-project builds include one root project and any number of subprojects.
 
     3) Task :-
             A basic unit of work, like compiling code or running tests.
@@ -35,29 +36,34 @@ Core Concepts :-
             Used to extend Gradle’s capabilities (like the Java plugin). Plugins often add tasks and conventions to projects.
 
     6) Dependency :-
-            	External or internal resources required by a project. Gradle automatically resolves these during the build.
+            External or internal resources required by a project. Gradle automatically resolves these during the build.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Project Structure :-
 
     project
-    ├── gradle                  1
-    ├── gradlew                 2
-    ├── gradlew.bat             2
-    ├── settings.gradle(.kts)   3
+    ├── gradle                              (1)
+    │   ├── libs.versions.toml              (2)
+    │   └── wrapper
+    │       ├── gradle-wrapper.jar
+    │       └── gradle-wrapper.properties
+    ├── gradlew                             (3)
+    ├── gradlew.bat                         (3)
+    ├── settings.gradle(.kts)               (4)
     ├── subproject-a
-    │   ├── build.gradle(.kts)  4
-    │   └── src/                5
+    │   ├── build.gradle(.kts)              (5)
+    │   └── src/                            (6)
     └── subproject-b
-        ├── build.gradle(.kts)  4
-        └── src/                5
+        ├── build.gradle(.kts)              (5)
+        └── src/                            (6)
 
-    1 :- Gradle Directory to store wrapper files and more
-    2 :- Gradle wrapper scripts THIS IS GRADLE PROJECT!
-    3 :- Gradle settings file to define a root project name and subprojects
-    4 :- Gradle build scripts of the two subprojects - subproject-a and subproject-b
-    5 :- Source code and/or additional files for the projects
+    (1) :- Gradle Directory to store wrapper files and more
+    (2) :- Gradle version catalog for dependency management
+    (3) :- Gradle wrapper scripts THIS IS GRADLE PROJECT!
+    (4) :- Gradle settings file to define a root project name and subprojects
+    (5) :- Gradle build scripts of the two subprojects - subproject-a and subproject-b
+    (6) :- Source code and/or additional files for the projects
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -74,9 +80,474 @@ Invoking Gradle :-
                 - gradle test
                 - gradle clean build
 
+        - b) With the Gradle Wrapper :-
+            The wrapper is a script that invokes a declared version of Gradle and is the recommended way to execute a Gradle build :-
+                - ./gradlew build
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Wrapper Basics :-
+
+    The recommended way to execute any Gradle build is with the Gradle Wrapper
+    The wrapper script invokes a declared version of Gradle, downloading it beforehand if necessary.
+
+    It is available as a 'gradlew' or 'gradlew.bat' file in the project root directory :-
+    root
+    ├── gradlew         // THE WRAPPER FOR Linux / macOS
+    ├── gradlew.bat     // THE WRAPPER FOR Windows
+    └── ...
+
+    Note :-    The wrapper is not something you download from the internet. You must generate it by running 'gradle wrapper' from a machine with Gradle installed.
+
+    The wrapper provides the following benefits :-
+        - 1) Automatically downloads and uses a specific Gradle version.
+        - 2) Standardizes a project on a given Gradle version.
+        - 3) Provisions the same Gradle version for different users and environments (IDEs, CI servers…).
+        - 4) Makes it easy to run Gradle builds without installing Gradle manually.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Using the Gradle Wrapper :-
+
+    It’s important to distinguish between two ways of running Gradle :-
+        1) Using a system-installed Gradle distribution :- by running the gradle command.
+        2) Using the Gradle Wrapper                     :- by running the gradlew or gradlew.bat script included in a Gradle project.
+
+    The Gradle Wrapper is always the recommended way to execute a build to ensure a reliable, controlled, and standardized execution of the build.
+
+    1) Using a system-installed Gradle distribution :-
+        - gradle build
+
+    2) Using the Gradle Wrapper :-
+        - a) Wrapper invocation on a Linux or OSX machine :-
+            - ./gradlew build
+        - b) Wrapper invocation on Windows Powershell :-
+            - gradlew.bat build
+
+    If you want to run the command in a different directory, you must provide the relative path to the wrapper :-
+        - ../gradlew build
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Note :-
+
+    +------------------------------------+-------------------------+
+    | Scenario                           | Need to create wrapper? |
+    +------------------------------------+-------------------------+
+    | Using Spring Initializr            | ❌ No                    |
+    | Manually created project           | ✔ Yes                   |
+    | Cloned project missing wrapper     | ✔ Yes                   |
+    | Upgrading wrapper version          | ✔ Yes                   |
+    +------------------------------------+-------------------------+
+
+Create Wrapper Manually Using :-        gradle wrapper
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Understanding the Wrapper files :-
+
+    Root Directory
+    ├
+    ├── gradle
+    │   └── wrapper
+    │       ├── gradle-wrapper.jar
+    │       └── gradle-wrapper.properties
+    ├── gradlew         <--- For Linux & MacOS
+    └── gradlew.bat     <--- For Windows
+
+    1) gradle-wrapper.jar :-
+            This is a small JAR file that contains the Gradle Wrapper code.
+            It is responsible for downloading and installing the correct version of Gradle for a project if it's not already installed.
+
+    2) gradle-wrapper.properties :-
+            This file contains configuration properties for the Gradle Wrapper, such as the distribution URL (where to download Gradle from)
+            and the distribution type (ZIP or TARBALL).
+
+    3) gradlew :-
+            This is a shell script (Unix-based System) that acts as a wrapper around 'gradle-wrapper.jar'.
+            It is used to execute Gradle tasks on Unix-based systems without needing to manually install Gradle.
+
+    4) gradlew.bat :-
+            This is a batch script (Windows) that serves the same purpose as 'gradlew' but is used on Windows system.
 
 
+    If you want to view or update the Gradle version of your project, use the command line :-
+
+        1) ./gradlew --version
+        1) ./gradlew wrapper --gradle-version 7.2
+
+        2) ./gradlew.bat --version
+        2) ./gradlew.bat wrapper --gradle-version 7.2
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Command-Line Interface Basics :-
+
+    The command-line interface is the primary method of interacting with Gradle outside the IDE.
+    The Gradle CLI is the primary way to interact with a Gradle build from the terminal.
+    You can use it to run tasks, inspects the build, manage dependencies, and control logging, all through flexible and powerful command-line options.
+
+    Use of the Gradle Wrapper is highly encouraged :-
+        Substitute ./gradlew for gradle (For Linux & macOS).
+        Substitute ./gradlew.bat for gradle (For Windows).
+
+    Executing Gradle on the command line conforms to the following structure :-
+
+        1) gradle [taskName..] [--option-name...]
+
+        Options are allowed before and after task names :-
+            2) gradle [--option-name...] [taskName]
+
+        If multiple tasks are specified, you should separate them with a space
+            3) gradle [taskName1 taskName2 ...] [--option-name...]
+
+        Options that accepts values can be specified with or without '=' between the option and argument, The use of '=' is recommended
+            4) gradle [taskName1 taskName2 ..] --console=plain
+
+        Options the enables behavior have long-form options with inverse specified with '--no-'. The following are opposites
+            5) gradle [taskName1 taskName2 ...] --build-cache
+            5) gradle [taskName1 taskName2 ...] --no-build-cache
+
+        Many long-form options have short-option equivalents.
+            6) gradle --help
+            6) gradle -h
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Command-line Usage :-
+
+    Executing tasks :-
+
+        To execute a task called taskName on the root project, type :-
+            gradle :taskName = gradle [taskName1 taskName2 ...] [--option-name...]
+
+    Specify options for tasks :-
+
+        To pass an option to a task, prefix the option name with '=' after the task name :-
+            gradle taskName --exampleOption=exampleValue
+            gradle [taskName1 taskName2 ...] [--option-name...]
+            gradle [taskName1 taskName2 ..] --console=plain
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Settings File Basics :-
+
+    The settings file is the Entry-Point of every Gradle project.
+    The Primary Purpose of the 'settings.gradle' is to add subprojects to your build
+    Gradle supports single and multi-project builds :-
+        - 1) For single-project builds, the settings.gradle file is optional
+        - 2) For multi-project builds, the settings.gradle file is mandatory and declares all subprojects.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Settings scripts :-
+
+    The settings.gradle file is a script.
+    It is either a 'settings.gradle' file written in Groovy or a 'settings.gradle.kts' file in Kotlin.
+    The settings.gradle file is typically found in the root directory of the project
+
+    Structure :-
+
+        rootProject.name = 'root-project'       (1)
+        include('sub-project-a')                (2)
+        include('sub-project-b')                (2)
+        include('sub-project-c')                (2)
+
+        (1)	Define the project name :-
+                rootProject.name = "root-project"
+                There is only one root project per build
+
+        (2) Add subprojects :-
+                The settings file defines the structure of the project by including subprojects, if there are any :-
+                include("app")
+                include("business-logic")
+                include("data-model")
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Build File Basics :-
+
+    Generally, a build script details build configuration, tasks, and plugins
+    Every Gradle build comprises at least one build script/
+    In the build file, two types of dependencies can be added :-
+        - 1) The libraries and/or plugins on which Gradle and the build script depend.
+        - 2) The libraries on which the project sources (i.e., source code) depend.
+
+    The build script is either a 'build.gradle' file written in Groovy or a 'build.gradle.kts' file in Kotlin
+
+    build.gradle :-
+
+        plugins {
+            id 'application'                    (1)
+        }
+
+        application {           <--- Gradle task / extension configuration blocks.
+            mainClass = 'com.example.Main'      (2)
+        }
 
 
+    (1) Add plugins :-
+            - Plugins extend Gradle’s functionality and can contribute tasks to a project.
+            - Adding a plugin to a build is called applying a plugin and makes additional functionality available.
+            - The 'application' plugin facilitates creating an executable JVM application.
+            - Applying the 'application' plugin also implicitly applies the 'java' plugin.
+                - The 'java' plugin adds Java compilation along with testing and bundling capabilities to a project.
+
+    (2) Use convention properties :-
+            - A plugin adds tasks to a project. It also adds properties and methods to a project.
+            - The 'application' plugin defines tasks that package and distribute an application, such as the run task.
+            - The 'application' plugin provides a way to declare the main class of a Java application, which is required to execute the code.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Dependency Management Basics :-
+
+    Gradle has built-in support for dependency management.
+    Dependency management is an automated technique for declaring and resolving external resources required by a project.
+    Gradle build scripts define the process to build projects that may require external dependencies.
+    Dependencies refer to JARs, plugins, libraries, or source code that support building your project.
+
+    Version Catalog :-
+        - Version Catalog provide a way to centralize your dependency declarations in a 'libs.versions.toml' file.
+        - The catalog makes sharing dependencies and version configurations between subprojects simple.
+        - It also allows teams to enforce versions of libraries and plugins in large projects.
+
+        The version catalog typically contains four sections :-
+            - 1) [versions] to declare the version numbers that plugins and libraries will reference.
+            - 2) [libraries] to define the libraries used in the build files.
+            - 3) [bundles] to define a set of dependencies.
+            - 4) [plugins] to define plugins.
+
+            gradle.versions.toml :-
+
+                [versions]
+                androidGradlePlugin = "7.4.1"
+                mockito = "2.16.0"
+
+                [libraries]
+                googleMaterial = { group = "com.google.android.material", name = "material", version = "1.1.0-alpha05" }
+                mockitoCore = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+
+                [plugins]
+                androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+
+            - The file is located in the gradle directory so that it can be used by Gradle and IDEs automatically.
+            - The version catalog should be checked into source control :- gradle/libs.versions.toml.
+
+    Declaring Your Dependencies :-
+
+        To add a dependency to your project, specify a dependency in the dependencies block of your build.gradle file.
+
+        build.gradle :-
+
+            plugins {
+                alias(libs.plugins.androidApplication)                                          (1)
+            }
+
+            android {               <--- Gradle task / extension configuration blocks.
+                namespace 'com.example.myapp'
+                compileSdk 33
+            }
+
+            dependencies {
+                // Material Design library
+                implementation(libs.googleMaterial)                                             (2)
+
+                // Mockito core (using version.ref = "mockito")
+                testImplementation(libs.mockitoCore)                                            (3)
+
+                // Recommended test dependencies for Android apps
+                testImplementation 'junit:junit:4.13.2'
+                androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+                androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+            }
+
+        (1) Applies the Android Gradle plugin to this project, which adds several features that are specific to building Android apps.
+        (2) Adds the Material dependency to the project.
+            Material Design provides components for creating a user interface in an Android App.
+            This library will be used to compile and run the Kotlin source code in this project.
+        (3) Adds the Mockito dependency to the project.
+            Mockito is a mocking framework for testing Java code.
+            This library will be used to compile and run the test source code in this project.
+
+    Dependencies in Gradle are grouped by configurations.
+        - 1) The material library is added to the implementation configuration, which is used for compiling and running production code.
+        - 2) The mockito-core library is added to the testImplementation configuration, which is used for compiling and running test code.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Viewing Project Dependencies :-
+
+    1) Show all dependencies (most common) :-
+        - gradle dependencies
+        - ./gradlew dependencies
+        - ./gradlew.bat dependencies
+
+    2) Show dependencies for a specific configuration :-
+        compileClasspath :-
+            ./gradlew dependencies --configuration compileClasspath
+        runtimeClasspath :-
+            ./gradlew dependencies --configuration runtimeClasspath
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Tasks Basics :-
+
+    - A task represents some independent unit of work that a build performs,
+        such as compiling classes, creating a JAR, generating Javadoc, or publishing archives to a repository.
+
+    1) How to run task :-
+
+        1) gradle [taskName..] [--option-name...]
+
+        Options are allowed before and after task names :-
+            2) gradle [--option-name...] [taskName]
+
+        If multiple tasks are specified, you should separate them with a space
+            3) gradle [taskName1 taskName2 ...] [--option-name...]
+
+        Options that accepts values can be specified with or without '=' between the option and argument, The use of '=' is recommended
+            4) gradle [taskName1 taskName2 ..] --console=plain
+
+        Options the enables behavior have long-form options with inverse specified with '--no-'. The following are opposites
+            5) gradle [taskName1 taskName2 ...] --build-cache
+            5) gradle [taskName1 taskName2 ...] --no-build-cache
+
+    2) How to see Available Tasks :-
+
+        - gradle tasks
+        - ./gradlew tasks
+        - ./gradlew.bat tasks
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Plugin Basics :-
+
+    - Gradle is built on a plugin system.
+    - Gradle itself is primarily composed of infrastructure, such as a sophisticated dependency resolution engine.
+    - The rest of its functionality comes from plugins.
+    - A plugin is a piece of software that provides additional functionality to the Gradle build system.
+
+    Plugins can be applied to a Gradle build script to add new tasks, configurations, or other build-related capabilities :-
+
+        1) The Java Library Plugin - 'java-library' :-
+            Used to define and build Java libraries.
+            It compiles Java source code with the compileJava task, generates Javadoc with the javadoc task, and packages the compiled classes into a JAR file with the jar task.
+
+        2) The Google Services Gradle Plugin - 'com.google.gms:google-services' :-
+            Enables Google APIs and Firebase services in your Android application with a configuration block called googleServices{} and a task called generateReleaseAssets.
+
+        3) The Gradle Bintray Plugin - 'com.jfrog.bintray' :-
+            Allows you to publish artifacts to Bintray by configuring the plugin using the bintray{} block.
+
+    Plugins Type :-
+
+        Plugins are distributed in three ways :-
+            1) Core plugins       :-  Gradle develops and maintains a set of Core Plugins.
+            2) Community plugins  :-  Gradle’s community shares plugins via the Gradle Plugin Portal.
+            3) Local plugins      :-  Gradle enables users to create custom plugins using APIs.
+
+    How to apply plugins :-
+
+        Applying a plugin to a project allows the plugin to extend the project’s capabilities.
+        You apply plugins in the build script using a plugin id (a globally unique identifier / name) and a version :-
+
+        plugins {
+            id «plugin id» version «plugin version»
+        }
 
 
+    1) Core Plugins :-
+
+        Gradle Core plugins are a set of plugins that are included in the Gradle distribution itself.
+            These plugins provide essential functionality for building and managing projects.
+        Example :-
+            1) java :- Provides support for building Java projects.
+            2) groovy :- Adds support for compiling and testing Groovy source files.
+            3) ear :- Adds support for building EAR files for enterprise applications.
+
+        Core plugins are unique in that they provide short names, such as java for the core JavaPlugin, when applied in build scripts.
+        They also do not require versions.
+        To apply the java plugin to a project :-
+            plugins {
+                id 'java'
+            }
+
+    2) Community Plugins :-
+
+        Community plugins are plugins developed by the Gradle community, rather than being part of the core Gradle distribution.
+        These plugins provide additional functionality that may be specific to certain use cases or technologies.
+
+        The Spring Boot Gradle plugin packages executable JAR or WAR archives, and runs Spring Boot Java applications.
+        To apply the org.springframework.boot plugin to a project :-
+            plugins {
+                id 'org.springframework.boot' version '3.1.3'
+            }
+
+        Note :- Community plugins can be published at the Gradle Plugin Portal, where other Gradle users can easily discover and use them.
+
+    3) Local Plugins :-
+
+        Custom or local plugins are developed and used within a specific project or organization.
+        These plugins are not shared publicly and are tailored to the specific needs of the project or organization.
+        Local plugins can encapsulate common build logic, provide integrations with internal systems or tools, or abstract complex functionality into reusable components.
+
+        Gradle provides users with the ability to develop custom plugins using APIs.
+        To create your own plugin, you’ll typically follow these steps :-
+
+            1) Define the plugin class :- create a new class that implements the Plugin<Project> interface.
+
+                class HelloPlugin implements Plugin<Project> {
+
+                    @Override
+                    void apply(Project project) {
+                        // Register the 'hello' task
+                        project.tasks.register("hello") {
+                            doLast {
+                                println "Hello, Gradle!"
+                            }
+                        }
+                    }
+                }
+
+            2) Build and optionally publish your plugin :-
+                    generate a JAR file containing your plugin code and optionally publish this JAR to a repository (local or remote) to be used in other projects.
+
+                plugins {
+                    id 'maven-publish'
+                }
+
+                publishing {
+                    publications {
+                        mavenJava(MavenPublication) {
+                            from components.java
+                        }
+                    }
+                    repositories {
+                        mavenLocal()       <--- for local
+                        maven {            <--- for remote
+                            url = uri('http://10.121.74.103:8082/artifactory/gradle-release-local');
+                            allowInsecureProtocol = true
+                        }
+                    }
+                }
+
+            3) Apply your plugin :-
+                    when you want to use the plugin, include the plugin ID and version in the plugins{} block of the build file.
+
+                plugins {
+                    id("com.example.hello") version "1.0"
+                }
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Gradle Incremental Builds and Build Caching :-
+
+    Gradle uses two main features to reduce build time :-
+        1) incremental builds
+        2) build caching.
+
+    1) Incremental Builds :-
+
+        An incremental build is a build that avoids running tasks whose inputs have not changed since the previous build.
+        Re-executing such tasks is unnecessary if they would only re-produce the same output.
